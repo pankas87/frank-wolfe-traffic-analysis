@@ -1,3 +1,4 @@
+import collections
 from .streetedge import StreetEdge
 
 class NetFileParser:
@@ -8,10 +9,11 @@ class NetFileParser:
     self.fp = open( path, 'r' )
 
   def read(self):
-    edges = []
+    edges = collections.OrderedDict()
 
     for i, line in enumerate(self.fp):
       if( i >= self.STARTING_LINE ):
-        edges.append( StreetEdge.from_file_line( line ) )
+        edge = StreetEdge.from_file_line( line )
+        edges[ edge.label ] = edge
 
     return edges

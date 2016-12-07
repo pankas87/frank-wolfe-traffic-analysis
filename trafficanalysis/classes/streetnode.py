@@ -1,8 +1,8 @@
 class StreetNode:
-  def __init__(self, number, x, y):
-    self.number = number
-    self.x   = x
-    self.y   = y
+  def __init__(self, label, x, y):
+    self.label  = label
+    self.x      = x
+    self.y      = y
 
   @classmethod
   def from_file_line(cls, line):

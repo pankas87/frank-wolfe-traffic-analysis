@@ -1,3 +1,4 @@
+import collections
 from .streetnode import StreetNode
 
 class NodeFileParser:
@@ -8,10 +9,11 @@ class NodeFileParser:
     self.fp = open( path, 'r' )
 
   def read(self):
-    nodes = []
+    nodes = collections.OrderedDict()
 
     for i, line in enumerate(self.fp):
       if( i >= self.STARTING_LINE ):
-        nodes.append( StreetNode.from_file_line( line ) )
+        node = StreetNode.from_file_line( line )
+        nodes[ node.label ] = node
 
     return nodes

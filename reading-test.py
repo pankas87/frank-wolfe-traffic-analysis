@@ -10,10 +10,11 @@ edges       = edge_reader.read()
 
 graph = nx.Graph()
 
-for node in nodes:
+for key, node in nodes.iteritems():
   graph.add_node( node.number, pos=( node.x, node.y ) )
 
-for edge in edges:
+
+for key, edge in edges.iteritems():
   graph.add_edge( edge.tail_node, edge.head_node )
 
 nx.draw( graph, nx.get_node_attributes( graph, 'pos' ) )
