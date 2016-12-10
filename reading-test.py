@@ -11,7 +11,7 @@ edges       = edge_reader.read()
 graph = nx.Graph()
 
 for key, node in nodes.iteritems():
-  graph.add_node( node.number, pos=( node.x, node.y ) )
+  graph.add_node( node.label, pos=( node.x, node.y ) )
 
 
 for key, edge in edges.iteritems():

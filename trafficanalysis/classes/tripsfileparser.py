@@ -1,5 +1,5 @@
 import re
-import collections
+import collections as coll
 from .nodetrip import NodeTrip
 
 class TripsFileParser:
@@ -10,8 +10,9 @@ class TripsFileParser:
     self.fp = open( path, 'r' )
 
   def read(self):
-    trips_matrix = collections.OrderedDict()
     origin_node  = None
+    collection   = coll.OrderedDict()
+    i            = 1
 
     for line in self.fp:
       line = line.replace(' ', '')
@@ -19,19 +20,19 @@ class TripsFileParser:
       line_type    = self.line_type( line )
       
       if( line_type == 'origin' ):
-        origin_node                 = self.get_origin_from_line( line )
-        trips_matrix[ origin_node ] = collections.OrderedDict()
+        origin_node = self.get_origin_from_line( line )
       elif( line_type == 'destinations' ):
         destinations = self.get_destinations_from_line( line )
 
         for dest_string in destinations:
-          dest_aray = dest_string.split(':')
-          dest_node = int( dest_aray[0] )
-          vehicles  = float( dest_aray[1] )
-          
-          trips_matrix[ origin_node ][ dest_node ] = NodeTrip( origin_node, dest_node, vehicles )
+          dest_array     = dest_string.split(':')
+          dest_node     = int( dest_array[0] )
+          vehicles      = float( dest_array[1] )
 
-    return trips_matrix
+          collection[i] =  NodeTrip( origin_node, dest_node, vehicles )
+          i += 1
+
+    return collection
 
   def line_type(self, line):
     if( line.find('Origin') != -1 ):

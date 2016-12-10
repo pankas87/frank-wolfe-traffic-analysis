@@ -1,4 +1,4 @@
-import collections
+import collections as coll
 from .streetedge import StreetEdge
 
 class NetFileParser:
@@ -9,11 +9,11 @@ class NetFileParser:
     self.fp = open( path, 'r' )
 
   def read(self):
-    edges = collections.OrderedDict()
+    collection   = coll.OrderedDict()
 
     for i, line in enumerate(self.fp):
       if( i >= self.STARTING_LINE ):
         edge = StreetEdge.from_file_line( line )
-        edges[ edge.label ] = edge
+        collection[ edge.label ] = edge
 
-    return edges
+    return collection

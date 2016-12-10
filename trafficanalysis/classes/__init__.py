@@ -4,3 +4,4 @@ from .nodefileparser import NodeFileParser
 from .netfileparser import NetFileParser
 from .trafficfileparser import TrafficFileParser
 from .tripsfileparser import TripsFileParser
+from .analysis import Analysis
