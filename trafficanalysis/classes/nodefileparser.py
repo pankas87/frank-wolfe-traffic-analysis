@@ -1,5 +1,4 @@
 from .streetnode import StreetNode
-import collections as coll
 
 class NodeFileParser:
   STARTING_LINE = 1
@@ -9,7 +8,7 @@ class NodeFileParser:
     self.fp = open( path, 'r' )
 
   def read(self):
-    collection   = coll.OrderedDict()
+    collection   = {}
 
     for i, line in enumerate(self.fp):
       if( i >= self.STARTING_LINE ):

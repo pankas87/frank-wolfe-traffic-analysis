@@ -1,54 +1,68 @@
-class StreetEdge:
-  x = [0]
-  y = []
+import math
+from decimal import *
 
+class StreetEdge:
   def __init__(self, tail_node, head_node, capacity, length, fftt, b, power ):
-    self.tail_node   = tail_node
-    self.head_node   = head_node
-    self.capacity    = capacity
-    self.length      = length
-    self.fftt        = fftt
-    self.b           = b
-    self.power       = power
-    self.label       = str( tail_node ) + '-' + str( head_node )
+    self.x         = [0] * 1024
+    self.y         = [0] * 1024
+    self.tail_node = tail_node
+    self.head_node = head_node
+    self.capacity  = capacity
+    self.length    = length
+    self.fftt      = fftt
+    self.tt        = []
+    self.b         = b
+    self.power     = power
+    self.label     = str( tail_node ) + '-' + str( head_node )
 
   def add_traffic(self, vehicles, n):
-    if( n == len( self.x ) ):
+    while( len( self.x ) <= ( n + 1 ) ):
       self.x.append(0)
 
     self.x[n] += vehicles
 
+  def add_traffic_change(self, vehicles, n):
+    while( len( self.y ) <= ( n + 1 ) ):
+      self.y.append(0)
+    
+    self.y[n] += vehicles
+
   def get_traffic(self, n):
     return self.x[n]
-
-  def add_traffic_change(self, vehicles, n):
-    if( n == len( self.y ) ):
-      self.y.append(0)
-
-    self.y[n] += vehicles
 
   def get_traffic_change(self, n):
     return self.y[n]
 
   def calculate_alpha_equation(self, n, alpha):
-    x         = self.x[n]
-    y         = self.y[n]
-    b         = self.b
-    capacity  = self.capacity
-    power     = self.power
-    fftt      = self.fftt
+    x         = Decimal( self.x[n] )
+    y         = Decimal( self.y[n] )
+    b         = Decimal( self.b )
+    capacity  = Decimal( self.capacity )
+    power     = Decimal( self.power )
+    fftt      = Decimal( self.fftt )
     flow      = x + ( alpha * ( y - x ) )
     result    = (y - x) * ( fftt ) * ( 1 + ( b * ( ( flow / capacity ) ** power ) ) )
     
-    return result
+    return Decimal( result )
+
+  def convergence_function(self, n):
+    x_1 = Decimal( self.x[ n ] )
+    x_2 = Decimal( self.x[ n + 1 ] )
+
+    if( x_1 == Decimal( 0.0 ) ):
+      return 0
+    else:
+      return Decimal( math.fabs( x_2 - x_1 ) / math.fabs( x_1 ) )
 
   def performance_function(self, n, truncate_to_integer = False):
-    x           = self.x[n]
-    b           = self.b
-    capacity    = self.capacity
-    power       = self.power
-    fftt        = self.fftt
-    performance = ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) )
+    x            = self.x[n]
+    b            = self.b
+    capacity     = self.capacity
+    power        = self.power
+    fftt         = self.fftt
+    performance  = ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) )
+    
+    self.tt.append( performance )
 
     return int( round( performance, 0 ) ) if truncate_to_integer else performance
 

@@ -2,15 +2,12 @@ import collections
 import networkx as nx
 
 class NodeTrip:
-  start_node        = ''
-  end_node          = ''
-  vehicles_per_trip = 0.0
-  path              = collections.OrderedDict()
 
   def __init__(self, start_node, end_node, vehicles_per_trip):
     self.start_node        = start_node
     self.end_node          = end_node
-    self.vehicles_per_trip = vehicles_per_trip
+    self.vehicles_per_trip = vehicles_per_trip * 1.75
+    self.path              = collections.OrderedDict()
 
   def set_path(self, path):
     self.path = path

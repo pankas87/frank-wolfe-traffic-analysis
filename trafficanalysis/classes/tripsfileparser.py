@@ -11,7 +11,7 @@ class TripsFileParser:
 
   def read(self):
     origin_node  = None
-    collection   = coll.OrderedDict()
+    collection   = {}
     i            = 1
 
     for line in self.fp:

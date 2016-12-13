@@ -1,4 +1,3 @@
-import collections as coll
 from .streetedge import StreetEdge
 
 class NetFileParser:
@@ -9,7 +8,7 @@ class NetFileParser:
     self.fp = open( path, 'r' )
 
   def read(self):
-    collection   = coll.OrderedDict()
+    collection   = {}
 
     for i, line in enumerate(self.fp):
       if( i >= self.STARTING_LINE ):

@@ -2,3 +2,5 @@ paso a paso tarea redes.pdf
 Tarea 1 CI5305 2016 .pdf
 Interest Links.md
 *.pyc
+/logs/*.txt
+/results/**

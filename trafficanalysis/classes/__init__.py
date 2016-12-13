@@ -5,3 +5,5 @@ from .netfileparser import NetFileParser
 from .trafficfileparser import TrafficFileParser
 from .tripsfileparser import TripsFileParser
 from .analysis import Analysis
+from .logs import Logs
+from .results import Results
