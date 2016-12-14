@@ -13,9 +13,9 @@ import Queue
 import math
 
 class Analysis:
-  def __init__(self, nodes, edges, trips, verbose = True):
+  def __init__(self, nodes, edges, trips, mode, verbose = True):
     self.ALPHA_PRECISSION       = Decimal( 0.000001 )
-    self.CONVERGENCE_PRECISSION = Decimal( 0.0001 )
+    self.CONVERGENCE_PRECISSION = Decimal( 0.00001 )
     self.NUM_ALPHA_CANDIDATES   = 10
     self.nodes                  = None
     self.edges                  = None 
@@ -30,8 +30,9 @@ class Analysis:
     self.edges                  = edges
     self.trips                  = trips
     self.verbose                = verbose
-    self.logs                   = Logs()
-    self.results                = Results( self.edges )
+    self.logs                   = Logs( mode )
+    self.results                = Results( self.edges, mode )
+    self.mode                   = mode
 
   def run(self):
     alpha_precision      = self.ALPHA_PRECISSION
@@ -58,17 +59,15 @@ class Analysis:
         elif( self.convergence_sums[ self.n ] < Decimal( 3.0 ) ):
           alpha_precision = Decimal( 0.000000001 )
 
-        self.convergence = self.is_convergent( self.convergence_sums[ self.n ] )
-
         self.log_results()
+
+        self.convergence = self.is_convergent( self.convergence_sums[ self.n ] ) 
 
       self.save_results( self.n );
 
       self.n += 1
 
-    self.print_message( 'It is convergent at iteration: ' + str( self.n ) )
-
-    print 'It is convergent at iteration: ' + str( self.n )
+    print 'It is convergent at iteration: ' + str( self.n - 1 )
     print datetime.datetime.now().strftime( "%d %b %Y %H:%M:%S"  )
     raw_input( 'Ola ke ase? Termino o ke ase?' )
 
@@ -240,9 +239,9 @@ class Analysis:
     self.results.save( n )
 
   @classmethod
-  def from_files(cls, nodes_file_path, edges_file_path, trips_file_path, verbose):
+  def from_files(cls, nodes_file_path, edges_file_path, trips_file_path, mode, verbose):
     nodes = NodeFileParser( nodes_file_path ).read()
-    edges = NetFileParser( edges_file_path ).read()
+    edges = NetFileParser( edges_file_path, mode ).read()
     trips = TripsFileParser( trips_file_path ).read()
 
-    return cls(nodes, edges, trips, verbose)
+    return cls(nodes, edges, trips, mode, verbose)

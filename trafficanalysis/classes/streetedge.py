@@ -2,7 +2,7 @@ import math
 from decimal import *
 
 class StreetEdge:
-  def __init__(self, tail_node, head_node, capacity, length, fftt, b, power ):
+  def __init__(self, tail_node, head_node, capacity, length, fftt, b, power, mode ):
     self.x         = [0] * 1024
     self.y         = [0] * 1024
     self.tail_node = tail_node
@@ -13,6 +13,7 @@ class StreetEdge:
     self.tt        = []
     self.b         = b
     self.power     = power
+    self.mode      = mode
     self.label     = str( tail_node ) + '-' + str( head_node )
 
   def add_traffic(self, vehicles, n):
@@ -55,19 +56,41 @@ class StreetEdge:
       return Decimal( math.fabs( x_2 - x_1 ) / math.fabs( x_1 ) )
 
   def performance_function(self, n, truncate_to_integer = False):
+    if( self.mode == 'user-balance' ):
+      performance = self.user_balance_performance_function( n, truncate_to_integer )
+    elif( self.mode == 'system-balance' ):
+      performance = self.system_balance_performance_function( n, truncate_to_integer )
+
+    self.tt.append( performance )
+
+    return performance
+
+  def user_balance_performance_function(self, n, truncate_to_integer):
     x            = self.x[n]
     b            = self.b
     capacity     = self.capacity
     power        = self.power
     fftt         = self.fftt
     performance  = ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) )
-    
-    self.tt.append( performance )
 
     return int( round( performance, 0 ) ) if truncate_to_integer else performance
 
+  def system_balance_performance_function(self, n, truncate_to_integer):
+    x            = self.x[n]
+    b            = self.b
+    capacity     = self.capacity
+    power        = self.power
+    fftt         = self.fftt
+
+    # TEST: b ** power
+    performance  = self.user_balance_performance_function( n, False )
+    performance += ( x * ( fftt * ( ( b * power ) / ( capacity ** power ) ) * ( x * ( 1.0 / power ) ) ) )
+    
+    return int( round( performance, 0 ) ) if truncate_to_integer else performance
+
+
   @classmethod
-  def from_file_line(cls, line):
+  def from_file_line(cls, line, mode):
     items = line.split( '\t' )
 
     del items[ 0 ]
@@ -81,4 +104,4 @@ class StreetEdge:
     b           = float( items[5] )
     power       = float( items[6] )
 
-    return cls( tail_node, head_node, capacity, length, fftt, b, power )
+    return cls( tail_node, head_node, capacity, length, fftt, b, power, mode )

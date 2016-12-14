@@ -2,7 +2,7 @@ import os
 import datetime
 
 class Results:
-  def __init__(self, edges, mode = 'user-equilibrium'):
+  def __init__(self, edges, mode = 'user-balance'):
     self.edges               = edges
     self.mode                = mode
     self.startng_time_string = datetime.datetime.now().strftime( "%Y-%m-%d  %H:%M"  )
@@ -25,7 +25,8 @@ class Results:
       fp.write( str( edge.fftt ) + ', ' )
       fp.write( str( edge.b ) + ', ' )
       fp.write( str( edge.power ) )
-      fp.write( '\n' )
+      fp.write( '\r\n' )
+      i += 1
 
     fp.close()
 

@@ -4,3 +4,4 @@ Interest Links.md
 *.pyc
 /logs/*.txt
 /results/**
+/final results/
