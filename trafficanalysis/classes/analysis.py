@@ -4,6 +4,7 @@ from .tripsfileparser import TripsFileParser
 from .nodetrip import NodeTrip
 from .logs import Logs
 from .results import Results
+from decimal import *
 import networkx as nx
 import time
 import datetime
@@ -13,9 +14,9 @@ import math
 
 class Analysis:
   def __init__(self, nodes, edges, trips, verbose = True):
-    self.ALPHA_PRECISSION       = Decimal( 0.000001 )
-    self.CONVERGENCE_PRECISSION = Decimal( 0.01 )    
-    self.NUM_ALPHA_CANDIDATES   = 35
+    self.ALPHA_PRECISSION       = Decimal( 0.0000001 )
+    self.CONVERGENCE_PRECISSION = Decimal( 0.001 )
+    self.NUM_ALPHA_CANDIDATES   = 100
     self.nodes                  = None
     self.edges                  = None 
     self.trips                  = None
@@ -117,11 +118,6 @@ class Analysis:
         i += 1
         j += 1
 
-        # Debug message      
-        self.print_message('Edge: ' + edge.label )
-        self.print_message( 'Vehicles - From: ' + str( edge.get_traffic( n ) ) + ' to: ' + str( edge.get_traffic_change( n ) ) )
-        self.print_message('')
-
     return edges
 
   def solve_alpha(self, n, edges):
@@ -135,10 +131,9 @@ class Analysis:
 
     while( not found ):
 
+      self.print_message( 'Candidate Alphas: ' )
       candidate_alphas = self.calculate_candidate_alphas( closest_to_zero )
-
-      # Debug message
-      self.print_message( 'cand_alpha' + str( candidate_alphas ) )
+      self.print_message( str( candidate_alphas ) )
 
       for alpha in candidate_alphas:
         f_alpha = self.calculate_alpha_function( n, edges, alpha )
@@ -173,11 +168,14 @@ class Analysis:
     down   = Decimal( closest_to_zero[ 'down' ][ 'alpha' ] )
     diff   = Decimal( math.fabs( up - down ) )
     step   = Decimal( diff / self.NUM_ALPHA_CANDIDATES )
-    i      = up
+    i      = self.NUM_ALPHA_CANDIDATES
+    num    = up    
 
-    while( i >= down ):
-      result.append( i )
-      i -= step
+    while( i >= 0 ):
+      result.append( num )
+      
+      num -= step
+      i   -= 1
 
     return result
 
@@ -197,11 +195,6 @@ class Analysis:
       new_traffic = float( ( x ) + ( alpha * ( y - x ) ) )
 
       edge.add_traffic( new_traffic, n + 1 )
-
-      # Debug message      
-      self.print_message('Edge: ' + edge.label )
-      self.print_message( 'New Vehicles - From: ' + str( edge.get_traffic( n ) ) + ' to: ' + str( edge.get_traffic( n + 1 ) ) )
-      self.print_message('')
 
     return edges
 

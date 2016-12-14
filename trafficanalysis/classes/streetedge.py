@@ -55,12 +55,12 @@ class StreetEdge:
       return Decimal( math.fabs( x_2 - x_1 ) / math.fabs( x_1 ) )
 
   def performance_function(self, n, truncate_to_integer = False):
-    x            = self.x[n]
-    b            = self.b
-    capacity     = self.capacity
-    power        = self.power
-    fftt         = self.fftt
-    performance  = ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) )
+    x            = Decimal( self.x[n] )
+    b            = Decimal( self.b )
+    capacity     = Decimal( self.capacity )
+    power        = Decimal( self.power )
+    fftt         = Decimal( self.fftt )
+    performance  = Decimal( ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) ) )
     
     self.tt.append( performance )
 
