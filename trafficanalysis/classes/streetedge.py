@@ -34,33 +34,33 @@ class StreetEdge:
     return self.y[n]
 
   def calculate_alpha_equation(self, n, alpha):
-    x         = Decimal( self.x[n] )
-    y         = Decimal( self.y[n] )
-    b         = Decimal( self.b )
-    capacity  = Decimal( self.capacity )
-    power     = Decimal( self.power )
-    fftt      = Decimal( self.fftt )
-    flow      = x + ( alpha * ( y - x ) )
+    x         = self.x[n]
+    y         = self.y[n]
+    b         = self.b
+    capacity  = self.capacity
+    power     = self.power
+    fftt      = self.fftt
+    flow      = x + ( float( alpha ) * ( y - x ) )
     result    = (y - x) * ( fftt ) * ( 1 + ( b * ( ( flow / capacity ) ** power ) ) )
     
     return Decimal( result )
 
   def convergence_function(self, n):
-    x_1 = Decimal( self.x[ n ] )
-    x_2 = Decimal( self.x[ n + 1 ] )
+    x_1 = self.x[ n ]
+    x_2 = self.x[ n + 1 ]
 
-    if( x_1 == Decimal( 0.0 ) ):
+    if( x_1 == 0.0 ):
       return 0
     else:
       return Decimal( math.fabs( x_2 - x_1 ) / math.fabs( x_1 ) )
 
   def performance_function(self, n, truncate_to_integer = False):
-    x            = Decimal( self.x[n] )
-    b            = Decimal( self.b )
-    capacity     = Decimal( self.capacity )
-    power        = Decimal( self.power )
-    fftt         = Decimal( self.fftt )
-    performance  = Decimal( ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) ) )
+    x            = self.x[n]
+    b            = self.b
+    capacity     = self.capacity
+    power        = self.power
+    fftt         = self.fftt
+    performance  = ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) )
     
     self.tt.append( performance )
 

@@ -14,9 +14,9 @@ import math
 
 class Analysis:
   def __init__(self, nodes, edges, trips, verbose = True):
-    self.ALPHA_PRECISSION       = Decimal( 0.0000001 )
-    self.CONVERGENCE_PRECISSION = Decimal( 0.001 )
-    self.NUM_ALPHA_CANDIDATES   = 100
+    self.ALPHA_PRECISSION       = Decimal( 0.000001 )
+    self.CONVERGENCE_PRECISSION = Decimal( 0.0001 )
+    self.NUM_ALPHA_CANDIDATES   = 10
     self.nodes                  = None
     self.edges                  = None 
     self.trips                  = None
@@ -25,7 +25,7 @@ class Analysis:
     self.f_alpha                = [None]
     self.n                      = 0
     self.convergence            = False
-    self.convergence_sum        = [None]
+    self.convergence_sums       = [None]
     self.nodes                  = nodes
     self.edges                  = edges
     self.trips                  = trips
@@ -34,6 +34,8 @@ class Analysis:
     self.results                = Results( self.edges )
 
   def run(self):
+    alpha_precision      = self.ALPHA_PRECISSION
+    num_alpha_candidates = self.NUM_ALPHA_CANDIDATES
 
     while( not self.convergence ):
       self.print_message('Starting Iteration: ' + str( self.n ), True )
@@ -47,11 +49,16 @@ class Analysis:
         self.alpha.append( alpha_solution[ 'alpha' ] )
         self.f_alpha.append( alpha_solution[ 'f_alpha' ] )
 
-        self.edges = self.assign_edges_traffic_with_alpha( self.n, self.alpha[ self.n ], self.edges )
+        self.edges       = self.assign_edges_traffic_with_alpha( self.n, self.alpha[ self.n ], self.edges )
+        
+        self.convergence_sums.append( self.convergence_sum( self.n, self.edges ) )
 
-        self.print_message( 'Alpha:  ' + str( self.alpha[ self.n ] ), True )      
+        if( self.convergence_sums[ self.n ] < Decimal( 10.0 ) ):
+          alpha_precision = Decimal( 0.00000001 )
+        elif( self.convergence_sums[ self.n ] < Decimal( 3.0 ) ):
+          alpha_precision = Decimal( 0.000000001 )
 
-        self.convergence = self.is_convergent( self.n, self.edges )
+        self.convergence = self.is_convergent( self.convergence_sums[ self.n ] )
 
         self.log_results()
 
@@ -122,18 +129,23 @@ class Analysis:
 
   def solve_alpha(self, n, edges):
     found           = False
-    closest_to_zero = { 'up': { 'alpha': 1.0, 'f_alpha': None }, 'down': { 'alpha': -1.0, 'f_alpha': None } }
+    segments        = self.NUM_ALPHA_CANDIDATES
+    closest_to_zero = { 'up': { 'alpha': Decimal( 1.0 ), 'f_alpha': None }, 'down': { 'alpha': Decimal( -1.0 ), 'f_alpha': None } }
     solution_alpha  = None
+    iterations      = 0
     
     # Debug message
     self.print_message( 'Looking for alpha solution' )
 
-
     while( not found ):
 
-      self.print_message( 'Candidate Alphas: ' )
-      candidate_alphas = self.calculate_candidate_alphas( closest_to_zero )
-      self.print_message( str( candidate_alphas ) )
+      if( ( iterations % 30 ) == 0 ):
+        closest_to_zero = { 'up': { 'alpha': Decimal( 1.0 ), 'f_alpha': None }, 'down': { 'alpha': Decimal( -1.0 ), 'f_alpha': None } }
+        segments *= Decimal( 1.5 )
+
+      self.print_message( 'Getting candidate alphas' )
+      candidate_alphas = self.calculate_candidate_alphas( closest_to_zero, segments )
+      self.print_message( 'Testing new array of candidate alphas' )
 
       for alpha in candidate_alphas:
         f_alpha = self.calculate_alpha_function( n, edges, alpha )
@@ -152,7 +164,7 @@ class Analysis:
       else:
         alpha_to_test = closest_to_zero[ 'down' ]
 
-      if( alpha_to_test[ 'f_alpha' ] >= Decimal( 0 ) and alpha_to_test[ 'f_alpha' ] <= Decimal( self.ALPHA_PRECISSION ) ):
+      if( math.fabs( alpha_to_test[ 'f_alpha' ] ) >= Decimal( 0 ) and math.fabs( alpha_to_test[ 'f_alpha' ] ) <= self.ALPHA_PRECISSION ):
         solution_alpha = alpha_to_test
         found = True
 
@@ -160,15 +172,17 @@ class Analysis:
         self.print_message( 'solution_alpha: f(' + str( alpha_to_test[ 'alpha' ] ) + ')=' + str( alpha_to_test[ 'f_alpha' ] ) )
         self.print_message( '', True )
 
+      iterations += 1
+
     return solution_alpha
 
-  def calculate_candidate_alphas(self, closest_to_zero):
+  def calculate_candidate_alphas(self, closest_to_zero, segments):
     result = []
-    up     = Decimal( closest_to_zero[ 'up' ][ 'alpha' ] )
-    down   = Decimal( closest_to_zero[ 'down' ][ 'alpha' ] )
+    up     = closest_to_zero[ 'up' ][ 'alpha' ]
+    down   = closest_to_zero[ 'down' ][ 'alpha' ]
     diff   = Decimal( math.fabs( up - down ) )
-    step   = Decimal( diff / self.NUM_ALPHA_CANDIDATES )
-    i      = self.NUM_ALPHA_CANDIDATES
+    step   = Decimal( diff / segments )
+    i      = segments
     num    = up    
 
     while( i >= 0 ):
@@ -183,7 +197,7 @@ class Analysis:
     sum = Decimal( 0 )
 
     for key, edge in edges.iteritems():
-      sum += Decimal( edge.calculate_alpha_equation(n, alpha) )
+      sum += edge.calculate_alpha_equation(n, alpha)
 
     return sum
 
@@ -198,15 +212,16 @@ class Analysis:
 
     return edges
 
-  def is_convergent(self, n, edges):
+  def convergence_sum(self, n, edges):
     sum = Decimal( 0 )
 
     for key, edge in edges.iteritems():
-      sum += Decimal( edge.convergence_function( n ) )
+      sum += edge.convergence_function( n )
 
-    self.convergence_sum.append(sum)
+    return sum
 
-    if( sum >= Decimal( 0 ) and sum <= self.CONVERGENCE_PRECISSION ):
+  def is_convergent(self, convergence_sum):
+    if( convergence_sum >= Decimal( 0 ) and convergence_sum <= self.CONVERGENCE_PRECISSION ):
       return True
     else:
       return False
@@ -219,7 +234,7 @@ class Analysis:
       #raw_input('Press Enter to Continue...')
 
   def log_results(self):
-    self.logs.log( self.n, self.alpha, self.f_alpha, self.convergence_sum )
+    self.logs.log( self.n, self.alpha, self.f_alpha, self.convergence_sums )
 
   def save_results(self, n):
     self.results.save( n )
