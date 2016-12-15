@@ -2,8 +2,10 @@ from .streetnode import StreetNode
 from .streetedge import StreetEdge
 from .nodefileparser import NodeFileParser
 from .netfileparser import NetFileParser
+from .resultsfilereader import ResultsFileReader
 from .trafficfileparser import TrafficFileParser
 from .tripsfileparser import TripsFileParser
 from .analysis import Analysis
 from .logs import Logs
 from .results import Results
+from .resultsgraph import ResultsGraph

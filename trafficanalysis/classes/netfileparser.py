@@ -3,7 +3,7 @@ from .streetedge import StreetEdge
 class NetFileParser:
   STARTING_LINE = 7
 
-  def __init__(self, path, mode):
+  def __init__(self, path, mode='user-balance'):
     self.mode = mode
     self.path = path
     self.fp = open( path, 'r' )

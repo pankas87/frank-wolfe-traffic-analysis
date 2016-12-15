@@ -6,7 +6,7 @@ class NodeTrip:
   def __init__(self, start_node, end_node, vehicles_per_trip):
     self.start_node        = start_node
     self.end_node          = end_node
-    self.vehicles_per_trip = vehicles_per_trip * 1.75
+    self.vehicles_per_trip = vehicles_per_trip
     self.path              = collections.OrderedDict()
 
   def set_path(self, path):

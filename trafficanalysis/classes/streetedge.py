@@ -2,7 +2,7 @@ import math
 from decimal import *
 
 class StreetEdge:
-  def __init__(self, tail_node, head_node, capacity, length, fftt, b, power, mode ):
+  def __init__(self, tail_node, head_node, capacity, length, fftt, b, power, mode = 'user-balance' ):
     self.x         = [0] * 1024
     self.y         = [0] * 1024
     self.tail_node = tail_node
@@ -88,6 +88,8 @@ class StreetEdge:
     
     return int( round( performance, 0 ) ) if truncate_to_integer else performance
 
+  def get_traffic_congestion(self, n):
+    return self.x[ n ] / self.capacity
 
   @classmethod
   def from_file_line(cls, line, mode):
@@ -96,12 +98,28 @@ class StreetEdge:
     del items[ 0 ]
     del items[ len(items) - 1 ]
 
-    tail_node   = int( items[0] )
-    head_node   = int( items[1] )
-    capacity    = float( items[2] )
-    length      = float( items[3] )
-    fftt        = float( items[4] )
-    b           = float( items[5] )
-    power       = float( items[6] )
+    tail_node   = int( items[ 0 ] )
+    head_node   = int( items[ 1 ] )
+    capacity    = float( items[ 2 ] )
+    length      = float( items[ 3 ] )
+    fftt        = float( items[ 4 ] )
+    b           = float( items[ 5 ] )
+    power       = float( items[ 6 ] )
 
     return cls( tail_node, head_node, capacity, length, fftt, b, power, mode )
+
+  @classmethod
+  def from_results_file_line(cls, line):
+    items     = line.split(',')
+    tail_node = int( items[ 1 ] )
+    head_node = int( items[ 2 ] )
+    x         = float( items[ 3 ] )
+    capacity  = float( items[ 5 ] )
+    fftt      = float( items[ 7 ] )
+    b         = float( items[ 8 ] )
+    power     = float( items[ 9 ] )
+
+    edge = cls( tail_node, head_node, capacity, None, fftt, b, power )
+    edge.add_traffic( x, 0 )
+
+    return edge

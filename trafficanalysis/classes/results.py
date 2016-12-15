@@ -31,7 +31,7 @@ class Results:
     fp.close()
 
   def get_dir(self):
-    dir = 'results/' + self.mode + ' - ' + self.startng_time_string + '/'
+    dir = 'results/original-' + self.mode + ' - ' + self.startng_time_string + '/'
     if( not os.path.isdir( dir ) ):
       os.makedirs( dir )
 
