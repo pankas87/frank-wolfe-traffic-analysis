@@ -14,8 +14,8 @@ import math
 
 class Analysis:
   def __init__(self, nodes, edges, trips, mode, verbose = True):
-    self.ALPHA_PRECISSION       = Decimal( 0.000001 )
-    self.CONVERGENCE_PRECISSION = Decimal( 0.00001 )
+    self.ALPHA_PRECISSION       = Decimal( 0.0000001 )
+    self.CONVERGENCE_PRECISSION = Decimal( 0.00000000001 )
     self.NUM_ALPHA_CANDIDATES   = 10
     self.nodes                  = None
     self.edges                  = None 
@@ -50,18 +50,23 @@ class Analysis:
         self.alpha.append( alpha_solution[ 'alpha' ] )
         self.f_alpha.append( alpha_solution[ 'f_alpha' ] )
 
-        self.edges       = self.assign_edges_traffic_with_alpha( self.n, self.alpha[ self.n ], self.edges )
-        
-        self.convergence_sums.append( self.convergence_sum( self.n, self.edges ) )
+        self.edges = self.assign_edges_traffic_with_alpha( self.n, self.alpha[ self.n ], self.edges )        
+        sum        = self.convergence_sum( self.n, self.edges )        
+        self.convergence_sums.append( sum )
 
         if( self.convergence_sums[ self.n ] < Decimal( 10.0 ) ):
-          alpha_precision = Decimal( 0.00000001 )
+          alpha_precision = Decimal( 0.000000000001 )
         elif( self.convergence_sums[ self.n ] < Decimal( 3.0 ) ):
-          alpha_precision = Decimal( 0.000000001 )
+          alpha_precision = Decimal( 0.0000000000001 )
+        else:
+          alpha_precision = self.ALPHA_PRECISSION
 
         self.log_results()
 
         self.convergence = self.is_convergent( self.convergence_sums[ self.n ] ) 
+
+        self.print_message( 'Convergence Sum: ' + str( sum ) )
+        self.print_message( '' )
 
       self.save_results( self.n );
 
@@ -140,7 +145,7 @@ class Analysis:
 
       if( ( iterations % 30 ) == 0 ):
         closest_to_zero = { 'up': { 'alpha': Decimal( 1.0 ), 'f_alpha': None }, 'down': { 'alpha': Decimal( -1.0 ), 'f_alpha': None } }
-        segments *= Decimal( 1.5 )
+        segments *= Decimal( 2.0 )
 
       self.print_message( 'Getting candidate alphas' )
       candidate_alphas = self.calculate_candidate_alphas( closest_to_zero, segments )

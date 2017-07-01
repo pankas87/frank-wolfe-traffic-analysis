@@ -59,9 +59,7 @@ class StreetEdge:
     if( self.mode == 'user-balance' ):
       performance = self.user_balance_performance_function( n, truncate_to_integer )
     elif( self.mode == 'system-balance' ):
-      performance = self.system_balance_performance_function( n, truncate_to_integer )
-
-    self.tt.append( performance )
+      performance = self.system_balance_performance_function( n, truncate_to_integer )    
 
     return performance
 
@@ -73,6 +71,8 @@ class StreetEdge:
     fftt         = self.fftt
     performance  = ( fftt ) * ( 1 + ( b * ( ( x / capacity ) ** power ) ) )
 
+    self.tt.append( performance )
+
     return int( round( performance, 0 ) ) if truncate_to_integer else performance
 
   def system_balance_performance_function(self, n, truncate_to_integer):
@@ -82,9 +82,10 @@ class StreetEdge:
     power        = self.power
     fftt         = self.fftt
 
-    # TEST: b ** power
     performance  = self.user_balance_performance_function( n, False )
     performance += ( x * ( fftt * ( ( b * power ) / ( capacity ** power ) ) * ( x * ( 1.0 / power ) ) ) )
+
+    self.tt.append( performance )
     
     return int( round( performance, 0 ) ) if truncate_to_integer else performance
 

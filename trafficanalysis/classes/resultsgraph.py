@@ -26,18 +26,21 @@ class ResultsGraph:
     return graph
 
   def render(self): 
-    node_positions = nx.get_node_attributes( self.graph, 'pos' )
-    node_labels    = nx.get_node_attributes( self.graph, 'label' )
-    edge_colors    = tuple( nx.get_edge_attributes( self.graph, 'color' ).values() )
-    #edge_colors    = edge_colors[387:]
-    edges          = self.graph.edges()
-    #edgelist       = edges[387:]
+    node_positions      = nx.get_node_attributes( self.graph, 'pos' )
+    node_labels         = nx.get_node_attributes( self.graph, 'label' )
+    edge_colors         = []
+    edges               = self.graph.edges()
 
-    nx.draw_networkx_nodes( self.graph, pos=node_positions, node_size=90, node_color="#999999" )
+    for edge in edges:
+      edge_data = self.graph.get_edge_data( edge[0], edge[1] ) 
+      edge_colors.append( edge_data[ 'color' ] )
 
-    # nx.draw_networkx_labels( self.graph, pos=node_positions, labels=node_labels, font_size=8)
 
-    nx.draw_networkx_edges( self.graph, node_positions, arrows=True, edge_color=edge_colors )
+    nx.draw_networkx_nodes( self.graph, pos=node_positions, node_size=300, node_color="#AAAAAA" )
+
+    nx.draw_networkx_labels( self.graph, pos=node_positions, labels=node_labels, font_size=9, font_color="#222222")
+
+    nx.draw_networkx_edges( self.graph, node_positions, arrows=True, edge_color=tuple( edge_colors ) )
 
     plt.show()
 
@@ -55,7 +58,7 @@ class ResultsGraph:
       return yellow
     elif( congestion >= 0.75 and congestion < 1.0 ):
       return orange
-    else:
+    elif( congestion > 1.0 ):
       return red    
 
   @classmethod
